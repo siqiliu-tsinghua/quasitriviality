@@ -85,6 +85,14 @@ and a genuinely coupled two-component example through `O(ε³)`.
   A result through finite order asserts neither all-order integrability nor
   convergence.
 
+## Toda / Dubrovin–Zhang benchmark
+
+The [Toda example](examples/toda/README.md) solves the coupled homological
+equations from the original lattice flow through `O(ε⁷)`, then matches both
+components of the published `F₁` and `F₂` in the tau gauge. The reproducible
+runner, full exact coefficient data, and a reconstructed genus-three density
+are in `examples/toda/`.
+
 ## Development documents
 
 - [AGENTS.md](AGENTS.md): mathematical and engineering rules.

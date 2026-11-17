@@ -22,7 +22,9 @@
   for inspecting or evaluating the exact local Volterra representation.
 - [ ] Increase supported domains and implement better accounting of
   coefficient singularities and parameter specializations.
-- [ ] Collect Dubrovin–Zhang free-energy examples, align gauges and compare
-  quasi-Miura transformations order by order.
+- [x] Cross-check the CP¹ Toda quasi-Miura map through genus two against
+  Dubrovin–Zhang, and compute and verify its genus-three extension.
+- [ ] Add a second Dubrovin–Zhang benchmark and generalize the fast
+  exact Laurent arithmetic beyond the Toda state-gap coefficients.
 - [ ] Consider nondiagonal input and automatic Riemann coordinates only after
   the diagonal pipeline is stable.

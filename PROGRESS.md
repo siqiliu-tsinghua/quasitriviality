@@ -54,3 +54,25 @@ and returned the documented cutoff and polynomiality result.
   `v=(2r+3s,r+2s)` with basepoint `(1,0)`, at `O(ε³)`. It returned
   one Volterra definition for the transformation and a polynomial
   transported generic Tsarev symmetry at the same cutoff.
+
+## 2026-11-17: Toda / Dubrovin–Zhang benchmark
+
+- Deposited all three requested PDFs in `/workspace/reference/toda-dubrovin-zhang`.
+  Read the Toda difference and tau maps, Example 4, and the CP¹ genus-two
+  formula. The PDFs are reference data, not vendored in the repository.
+- Computed the complete homogeneous reducing and dressing maps from the
+  equation through `O(ε⁷)`. The exact specialized Laurent backend uses the
+  same hodograph quadratures as the coupled solver and no free-energy input.
+  Its bracket and direct chain-rule checks included the original lattice
+  variables, retaining the raw odd powers. A second SymPy physical-jet
+  calculation independently verified Lie reconstruction at ε², ε⁴, ε⁶.
+- In the tau Miura gauge, both components agree exactly with F₁ and F₂
+  at ε² and ε⁴. Reconstructing the genus-two density gives zero difference
+  from (3.10.116) itself. Reconstructing the genus-three density gives
+  290 terms of jet order at most seven and verifies both tau-coordinate
+  identities and the order-six tau equation. No external F₃ comparison
+  is claimed.
+- Complete coefficients, reproduction commands, assumptions and equations:
+  [examples/toda/README.md](examples/toda/README.md). Exact byte-for-byte
+  regeneration of the JSON also passed.
+  Full regression suite: **72 tests passed**.
