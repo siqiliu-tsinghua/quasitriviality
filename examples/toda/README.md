@@ -110,3 +110,10 @@ additional SymPy check in the flat fields `V` and `exp(U)`. Run
 `python -m unittest tests.test_toda -v` to check regeneration of the
 checked-in artifact, both literature comparisons, and agreement with the
 standard SymPy solver on the first nonzero correction.
+
+## Other Toda flows
+
+[SYMMETRIES.md](SYMMETRIES.md) applies this same archived transformation
+to two higher ordinary flows and the first nontranslation logarithmic
+flow. The complete coefficients are in
+[toda-symmetries-epsilon6.json](toda-symmetries-epsilon6.json).
