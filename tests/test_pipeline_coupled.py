@@ -41,13 +41,12 @@ class CoupledPipelineTests(unittest.TestCase):
         self.assertFalse(realized.universal_family)
         self.assertEqual(realized.polynomiality.status,PolynomialityStatus.POLYNOMIAL)
 
-    def test_noncommuting_leader_and_unresolved_span(self):
+    def test_noncommuting_leader_and_unresolved_equation(self):
         space,p,q = self.space,self.p,self.q
         eq = Series((self.x0,(-p*q,p*q)),2)
         with self.assertRaises(UnresolvedTransformation) as exc:
-            quasitrivialize(space,eq,solver=CoupledSolver(state_basis=()))
+            quasitrivialize(space, Series((self.x0,(q**2,0)),2))
         self.assertEqual(exc.exception.order,1)
-        self.assertIn("empty search space",str(exc.exception))
         transform = quasitrivialize(space,eq)
         with self.assertRaises(ValueError):
             transport_symmetry(transform,(1,0))

@@ -1,6 +1,7 @@
 """Exact, cutoff-aware quasi-Miura transformations and symmetry tests."""
 
 from .coupled import CoupledSolveUnresolved, CoupledSolver
+from .darboux import DarbouxProblem, volterra_definitions
 from .hodograph import HodographChart
 from .jets import JetSpace
 from .polynomiality import PolynomialityStatus
@@ -13,5 +14,6 @@ __all__ = [
     "JetSpace", "Series", "QuasiMiura", "UnresolvedTransformation",
     "SymmetryResult", "IntegrabilityResult", "quasitrivialize",
     "transport_symmetry", "check_integrability", "CoupledSolveUnresolved",
-    "CoupledSolver", "HodographChart", "TsarevFamily", "PolynomialityStatus",
+    "CoupledSolver", "DarbouxProblem", "volterra_definitions",
+    "HodographChart", "TsarevFamily", "PolynomialityStatus",
 ]

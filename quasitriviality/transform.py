@@ -89,8 +89,9 @@ def quasitrivialize(space, equation: Series, *, solver=None) -> QuasiMiura:
     """Find G with exp(ad_G) X0 = X and return G, T and T inverse.
 
     The domain must have nonvanishing speed gaps and self-derivatives.
-    For coupled input the default searches a finite documented class;
-    unresolved results do not prove nonexistence.
+    Coupled input is integrated by triangular elimination in generalized
+    hodograph jets, with an exact local Darboux integral at weight one.
+    An unresolved computation is not an integrability obstruction.
     """
     speeds = _leading_speeds(space, equation)
     equation = equation.map(canonical)

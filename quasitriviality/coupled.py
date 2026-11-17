@@ -1,39 +1,24 @@
-"""Verified finite-span solvers for coupled homological equations.
-
-This is not a general inverse for ad(X0), or the full smooth Darboux
-construction. An unsuccessful finite search is not a nonexistence proof.
-"""
-
+"""Constructive finite-jet inverse of the coupled homological operator."""
 from __future__ import annotations
-
-import operator
-from collections.abc import Iterable, Iterator, Sequence
 
 import sympy as sp
 
-from .jets import JetSpace, canonical, is_zero
+from .coupled_transport import (
+    first_primitive, jet_order, solve_transport, transverse_primitive, TransportUnresolved,
+)
+from .darboux import DarbouxUnresolved, solve_darboux
+from .hodograph import HodographChart
+from .jets import canonical, is_zero
 
 
 class CoupledSolveUnresolved(ValueError):
-    """No verified primitive was constructed in the selected search space."""
+    """The source did not yield a verified local Laurent–log primitive."""
 
 
-def _bound(value: int, label: str, minimum: int) -> int:
-    if isinstance(value, bool):
-        raise TypeError(f"{label} must be an integer")
-    value = operator.index(value)
-    if value < minimum:
-        raise ValueError(f"{label} must be at least {minimum}")
-    return value
-
-
-def _weight(space: JetSpace, source: tuple[sp.Expr, ...]) -> int:
+def _weight(space, source):
     nonzero = next(expr for expr in source if not is_zero(expr))
-    euler = sum(
-        s * space.jet(i, s) * sp.diff(nonzero, space.jet(i, s))
-        for i, s in space.active_jets(nonzero)
-        if s
-    )
+    euler = sum(s * space.jet(i, s) * nonzero.diff(space.jet(i, s))
+                for i, s in space.active_jets(nonzero) if s)
     weight = canonical(euler / nonzero)
     if not isinstance(weight, sp.Integer) or weight < 2:
         raise ValueError("source must have a homogeneous differential weight at least two")
@@ -43,220 +28,125 @@ def _weight(space: JetSpace, source: tuple[sp.Expr, ...]) -> int:
     return degree
 
 
-def _jet_monomials(
-    space: JetSpace, weight: int, max_order: int, max_inverse_power: int
-) -> Iterator[sp.Expr]:
-    # Lower bounds permit positive higher jet powers to be balanced by
-    # bounded negative powers of first jets.
-    entries = [
-        (space.jet(i, order), order, -max_inverse_power if order == 1 else 0)
-        for order in range(max_order, 0, -1)
-        for i in range(space.dimension)
-    ]
-    minima = [0] * (len(entries) + 1)
-    for k in range(len(entries) - 1, -1, -1):
-        _, degree, lower = entries[k]
-        minima[k] = minima[k + 1] + degree * lower
-
-    def visit(k: int, remaining: int, powers: list[sp.Expr]) -> Iterator[sp.Expr]:
-        if k == len(entries):
-            if remaining == 0:
-                yield sp.Mul(*powers)
-            return
-        symbol, degree, lower = entries[k]
-        upper = (remaining - minima[k + 1]) // degree
-        for exponent in range(lower, upper + 1):
-            if exponent:
-                powers.append(symbol**exponent)
-            yield from visit(k + 1, remaining - degree * exponent, powers)
-            if exponent:
-                powers.pop()
-
-    yield from visit(0, weight, [])
-
-
-def _log_monomials(space: JetSpace, limit: int) -> Iterator[sp.Expr]:
-    def visit(i: int, remaining: int, powers: list[sp.Expr]) -> Iterator[sp.Expr]:
-        if i == space.dimension:
-            yield sp.Mul(*powers)
-            return
-        for exponent in range(remaining + 1):
-            if exponent:
-                powers.append(space.log(i)**exponent)
-            yield from visit(i + 1, remaining - exponent, powers)
-            if exponent:
-                powers.pop()
-
-    yield from visit(0, limit, [])
-
-
-def _split_identity(expr: sp.Expr, variables: tuple[sp.Symbol, ...]) -> list[sp.Expr]:
-    """Split a denominator-cleared identity by variable-dependent factors.
-
-    Exact coefficient comparison works in a rational function ring.
-    Nonrational factors can be treated as distinct, so the search may
-    miss a solution even in the supplied span. Verification prevents
-    false positives.
-    """
-    numerator = sp.fraction(sp.together(expr))[0]
-    coefficients: dict[sp.Expr, sp.Expr] = {}
-    for term in sp.Add.make_args(sp.expand(numerator)):
-        coefficient, factor = term.as_independent(*variables, as_Add=False)
-        coefficients[factor] = coefficients.get(factor, sp.S.Zero) + coefficient
-    return [value for value in map(canonical, coefficients.values()) if not is_zero(value)]
+def _state_forcing(chart, residual):
+    """Read the z_j,1^(-1) residual and check its exact Darboux shape."""
+    forcing = {}
+    dimension = chart.dimension
+    jets = tuple(chart.jet(j, 1) for j in range(dimension))
+    for i, component in enumerate(residual):
+        if is_zero(component):
+            for j in range(dimension):
+                if j != i:
+                    forcing[i, j] = sp.S.Zero
+            continue
+        # If the shape is right, multiplying by the first jets gives a
+        # polynomial with exactly one distinct monomial for each j != i.
+        reduced = canonical(component * sp.prod(jets))
+        try:
+            poly = sp.Poly(reduced, *jets, domain="EX")
+        except sp.PolynomialError as exc:
+            raise CoupledSolveUnresolved("residual is not of Darboux form") from exc
+        for j in range(dimension):
+            if j == i:
+                continue
+            powers = tuple(0 if a == j else 1 for a in range(dimension))
+            coeff = poly.coeff_monomial(powers)
+            if chart.active_symbols(coeff):
+                raise CoupledSolveUnresolved("Darboux forcing still contains jets or logarithms")
+            forcing[i, j] = canonical(coeff / (chart.speeds[j] - chart.speeds[i]))
+        predicted = sum((chart.speeds[j] - chart.speeds[i]) * forcing[i, j] / jets[j]
+                        for j in range(dimension) if i != j)
+        if not is_zero(component - predicted):
+            raise CoupledSolveUnresolved("residual is not of Darboux form")
+    return forcing
 
 
 class CoupledSolver:
-    """Solve [X0, F] = source in an explicit finite homogeneous span.
+    """Integrate a coupled homological equation in generalized hodograph jets.
 
-    Default candidates are constant-coefficient jet polynomials, with
-    derivative order bounded by the requested generator weight. Override
-    max_jet_order for a different bound; max_inverse_power bounds the
-    negative exponent of each first jet, and max_log_degree bounds the
-    total formal-log exponent. Each allowed jet monomial is multiplied
-    by all entries of state_basis. extra_candidates supplies particular
-    vectors, including vectors whose components share a single coefficient.
-    Candidates of another weight are used only at that weight.
-
-    By default compare identities in the generalized hodograph chart
-    of the supplied semihamiltonian diagonal leading system. All
-    results are verified in physical jets. Work on a domain where the
-    speed gaps, self-derivatives and result denominators are nonzero;
-    a symbolic parameter in a solved denominator must be specialized
-    away from its zeros.
+    No candidate generators are searched. All finite jet orders and polynomial
+    degrees are dictated by the source. At degree one the residual state part
+    is a locally compatible affine Darboux problem. Optional `darboux_solver`
+    supplies an exact state-space primitive, not a jet-space basis.
     """
 
-    def __init__(
-        self,
-        *,
-        state_basis: Iterable[object] = (1,),
-        max_jet_order: int | None = None,
-        max_inverse_power: int = 0,
-        max_log_degree: int = 0,
-        extra_candidates: Iterable[Sequence[object]] = (),
-        max_candidates: int = 400,
-        use_hodograph: bool = True,
-    ) -> None:
-        self.state_basis = tuple(canonical(term) for term in state_basis)
-        self.max_jet_order = (
-            None if max_jet_order is None else _bound(max_jet_order, "max_jet_order", 1)
-        )
-        self.max_inverse_power = _bound(max_inverse_power, "max_inverse_power", 0)
-        self.max_log_degree = _bound(max_log_degree, "max_log_degree", 0)
-        self.extra_candidates = tuple(tuple(map(canonical, row)) for row in extra_candidates)
-        self.max_candidates = _bound(max_candidates, "max_candidates", 1)
-        self.use_hodograph = use_hodograph
+    def __init__(self, *, darboux_solver=None, basepoint=None):
+        self.darboux_solver = darboux_solver
+        self.basepoint = basepoint
 
-    def _candidates(
-        self, space: JetSpace, weight: int
-    ) -> Iterator[tuple[sp.Expr, ...]]:
-        if any(space.max_order(coefficient) for coefficient in self.state_basis):
-            raise ValueError("state_basis entries may not depend on positive-order jets")
-        zero = (sp.S.Zero,) * space.dimension
-        for candidate in self.extra_candidates:
-            if len(candidate) != space.dimension:
-                raise ValueError("extra candidate has the wrong number of components")
-            if candidate != zero and all(
-                space.is_homogeneous(expr, weight) for expr in candidate
-            ):
-                yield candidate
-
-        basis = tuple(term for term in self.state_basis if not is_zero(term))
-        if not basis:
-            return
-        max_order = self.max_jet_order or weight
-        for monomial in _jet_monomials(space, weight, max_order, self.max_inverse_power):
-            for logs in _log_monomials(space, self.max_log_degree):
-                for coefficient in basis:
-                    expr = canonical(monomial * logs * coefficient)
-                    for i in range(space.dimension):
-                        yield zero[:i] + (expr,) + zero[i + 1 :]
-
-    def __call__(
-        self, space: JetSpace, speeds: Sequence[object], source: Sequence[object]
-    ) -> tuple[sp.Expr, ...]:
+    def __call__(self, space, speeds, source):
+        speeds, source = tuple(map(canonical, speeds)), tuple(map(canonical, source))
         if space.dimension < 2:
             raise ValueError("use the scalar solver for a one-component equation")
-        speeds = tuple(map(canonical, speeds))
-        source = tuple(map(canonical, source))
         if len(speeds) != space.dimension or len(source) != space.dimension:
             raise ValueError("leading speeds and source must match the jet space dimension")
-        if any(space.max_order(speed) for speed in speeds):
-            raise ValueError("leading speeds may only depend on the state")
-        if any(expr.has(sp.Float) for expr in (*speeds, *source, *self.state_basis)):
+        if any(expr.has(sp.Float) for expr in (*speeds, *source)):
             raise ValueError("the exact solver does not accept floating-point coefficients")
         if all(is_zero(expr) for expr in source):
             return (sp.S.Zero,) * space.dimension
-        weight = _weight(space, source) - 1
-        candidates = []
-        seen = set()
-        for candidate in self._candidates(space, weight):
-            if candidate in seen:
-                continue
-            if any(expr.has(sp.Float) for expr in candidate):
-                raise ValueError("the exact solver does not accept floating-point candidates")
-            seen.add(candidate)
-            candidates.append(candidate)
-            if len(candidates) > self.max_candidates:
-                raise CoupledSolveUnresolved(
-                    f"weight {weight} search exceeds its {self.max_candidates}-candidate bound"
-                )
-        if not candidates:
-            raise CoupledSolveUnresolved(f"empty search space at generator weight {weight}")
+        m = _weight(space, source) - 2
+        chart = HodographChart(space, speeds)
+        if any(not is_zero(v) for v in chart.semi_hamiltonian_residual().values()):
+            raise ValueError("leading speeds must satisfy the semi-Hamiltonian identities")
+        if any(is_zero(v.diff(u)) for v, u in zip(speeds, chart.states)):
+            raise ValueError("leading self-derivatives must be nonzero")
+        residual = chart.normalize(source)
+        answer = (sp.S.Zero,) * chart.dimension
+        nmax = max(1, *(jet_order(chart, item) for item in residual))
 
-        parameters = set()
-        for expr in (*speeds, *source, *(x for row in candidates for x in row)):
-            parameters.update(
-                expr.free_symbols
-                - {space.jet(i, s) for i, s in space.active_jets(expr)}
-                - {space.log(i) for i in space.active_logs(expr)}
-            )
-        parameters.difference_update(space.states)
+        def subtract(parts):
+            nonlocal residual, answer
+            if all(is_zero(h) for h in parts):
+                return
+            action = chart.lie_action(speeds, parts)
+            residual = tuple(canonical(r - a) for r, a in zip(residual, action))
+            answer = tuple(canonical(h + x) for h, x in zip(answer, parts))
+
+        try:
+            for n in range(nmax, 0, -1):
+                if any(jet_order(chart, item) > n + 1
+                       for item in residual):
+                    raise CoupledSolveUnresolved("residual exceeds the homological order bound")
+                subtract(tuple(transverse_primitive(chart, i, r, n)
+                               for i, r in enumerate(residual)))
+                if any(jet_order(chart, item) > n for item in residual):
+                    raise CoupledSolveUnresolved("top transverse derivative did not cancel")
+                if n == 1:
+                    subtract(tuple(first_primitive(chart, i, r, m)
+                                   for i, r in enumerate(residual)))
+                    continue
+                # In row i no lower-order term or other unknown component
+                # contains z[i,n]. Determine all positive own powers.
+                for i in range(chart.dimension):
+                    z = chart.jet(i, n)
+                    while residual[i].has(z):
+                        polynomial = sp.Poly(residual[i], z, domain="EX")
+                        k = int(polynomial.degree())
+                        if k <= 0:
+                            raise CoupledSolveUnresolved("unsupported dependence on an own top jet")
+                        term = z**k * solve_transport(
+                            chart, i, polynomial.LC(), m + k, n - 1, alpha_factor=1-k
+                        )
+                        subtract(tuple(term if j == i else sp.S.Zero
+                                       for j in range(chart.dimension)))
+                        if residual[i].has(z) and sp.Poly(
+                                residual[i], z, domain="EX").degree() >= k:
+                            raise CoupledSolveUnresolved("own leading jet power did not cancel")
+        except (TransportUnresolved, sp.PolynomialError) as exc:
+            raise CoupledSolveUnresolved(str(exc)) from exc
+
+        if m == 0 and any(not is_zero(r) for r in residual):
+            forcing = _state_forcing(chart, residual)
+            try:
+                h = solve_darboux(chart, forcing, solver=self.darboux_solver, basepoint=self.basepoint)
+            except DarbouxUnresolved as exc:
+                raise CoupledSolveUnresolved(str(exc)) from exc
+            subtract(h)
+        if any(not is_zero(r) for r in residual):
+            raise CoupledSolveUnresolved("normalized bracket has a nonzero residual")
+        result = chart.denormalize(answer)
         leading = tuple(speed * space.jet(i, 1) for i, speed in enumerate(speeds))
-        if self.use_hodograph:
-            from .hodograph import HodographChart
-
-            chart = HodographChart(space, speeds)
-            target = chart.normalize(source)
-            # Compute matrix columns by bracket conjugacy. Applying the
-            # transported derivation to each rational inverse-jet expression
-            # separately creates much larger intermediate numerators; both
-            # forms give the same normalized operator.
-            columns = [chart.normalize(space.bracket(leading, row)) for row in candidates]
-        else:
-            target = source
-            columns = [space.bracket(leading, candidate) for candidate in candidates]
-        unknowns = tuple(sp.Dummy(f"c_{k}") for k in range(len(candidates)))
-        unknown_set = set(unknowns)
-        equations = []
-        for i, component in enumerate(target):
-            residual = sum(a * column[i] for a, column in zip(unknowns, columns)) - component
-            variables = tuple(sorted(
-                residual.free_symbols - unknown_set - parameters, key=sp.default_sort_key
-            ))
-            equations.extend(_split_identity(residual, variables))
-
-        if not equations:
-            # Even a vacuous coefficient solve gets verified independently.
-            coefficients = (sp.S.Zero,) * len(candidates)
-        else:
-            matrix, values = sp.linear_eq_to_matrix(equations, unknowns)
-            solution = sp.linsolve((matrix, values), unknowns)
-            if solution == sp.EmptySet:
-                raise CoupledSolveUnresolved(
-                    f"no exact witness found in the selected weight {weight} span"
-                )
-            coefficients = next(iter(solution))
-            free_zero = dict.fromkeys(unknowns, sp.S.Zero)
-            coefficients = tuple(term.xreplace(free_zero) for term in coefficients)
-
-        answer = tuple(
-            canonical(sum(c * candidate[i] for c, candidate in zip(coefficients, candidates)))
-            for i in range(space.dimension)
-        )
-        if any(
-            not is_zero(actual - expected)
-            for actual, expected in zip(space.bracket(leading, answer), source)
-        ):
-            raise CoupledSolveUnresolved("candidate solution did not verify in physical jets")
-        return answer
+        if (any(not space.is_homogeneous(x, m+1) for x in result)
+                or any(not is_zero(a-b) for a, b in zip(space.bracket(leading, result), source))):
+            raise CoupledSolveUnresolved("primitive did not verify in physical jets")
+        return result
