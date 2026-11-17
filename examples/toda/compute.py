@@ -15,7 +15,9 @@ from math import factorial
 
 MAX_JET_ORDER = 13  # the O(epsilon**7) checks use orders strictly below this
 N = MAX_JET_ORDER
-VARIABLE_COUNT = 1 + 2*N + 2
+V_INDEX = 1 + 2*N + 2
+U_INDEX = V_INDEX + 1  # U = 2 log(d/4), with its own differentiation rule
+VARIABLE_COUNT = U_INDEX + 1
 ZERO_KEY = (0,)*VARIABLE_COUNT
 
 
@@ -110,7 +112,7 @@ class L(dict):
         )
     def substitute(a,func):
         if not a:return L()
-        symbols=list(range(1+2*N+2))
+        symbols=range(VARIABLE_COUNT)
         active=[i for i in symbols if a.depends(i)]
         pow_cache={}
         out=L()
@@ -124,19 +126,24 @@ class L(dict):
                     m=m*pow_cache[idx]
             out+=m
         return out
-    def active(a):return [i for i in range(1+2*N+2) if a.depends(i)]
+    def active(a):return [i for i in range(VARIABLE_COUNT) if a.depends(i)]
     def serial(a):
-        return [[[[i,e] for i in range(1+2*N+2) if (e:=power_at(k,i))], str(v)]
+        return [[[[i,e] for i in range(VARIABLE_COUNT) if (e:=power_at(k,i))], str(v)]
                 for k,v in sorted(a.items()) if v]
 
 def mono(i,n=1): return L({move_power(ZERO_KEY,i,n):1})
 def j(i,n): return mono(variable_index(i,n))
 def log(i): return mono(log_index(i))
 d=mono(0)
+V=mono(V_INDEX)
+U=mono(U_INDEX)
 
 def dx(a,times=1):
     for _ in range(times):
-        acc=a.partial(0)*(j(0,1)-j(1,1))
+        gap_x = j(0,1)-j(1,1)
+        acc=a.partial(0)*gap_x
+        if b:=a.partial(V_INDEX):acc+=b*(j(0,1)+j(1,1))/2
+        if b:=a.partial(U_INDEX):acc+=2*b*gap_x/d
         for i in range(2):
             for n in range(1,a.degree_order()+1):
                 if b:=a.partial(variable_index(i,n)):acc+=b*j(i,n+1)
@@ -153,7 +160,10 @@ def evol(vector,target):
         applicable.append(derivatives)
     out=[]
     for a in target:
-        acc=a.partial(0)*(vector[0]-vector[1])
+        gap_t = vector[0]-vector[1]
+        acc=a.partial(0)*gap_t
+        if b:=a.partial(V_INDEX):acc+=b*(vector[0]+vector[1])/2
+        if b:=a.partial(U_INDEX):acc+=2*b*gap_t/d
         for i in range(2):
             for n in range(1,a.degree_order()+1):
                 if b:=a.partial(variable_index(i,n)):acc+=b*applicable[i][n]
