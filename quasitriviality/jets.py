@@ -23,7 +23,13 @@ def canonical(expr: object) -> sp.Expr:
     expr = sp.expand(_expr(expr))
     if expr.is_number or expr.is_polynomial(*expr.free_symbols):
         return expr
-    return sp.expand(sp.cancel(expr))
+    # `cancel` multiplies expanded but algebraically identical denominator
+    # sums in different terms. Factoring their common factors before taking
+    # the common denominator avoids this combinatorial expansion.
+    terms = [sp.factor_terms(term) for term in sp.Add.make_args(expr)]
+    num, den = sp.fraction(sp.cancel(sp.together(sp.Add(*terms))))
+    den = sp.factor_terms(den)
+    return sp.Add(*(term / den for term in sp.Add.make_args(num)))
 
 
 def is_zero(expr: object) -> bool:
