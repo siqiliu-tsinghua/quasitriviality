@@ -6,7 +6,7 @@ from sympy import Derivative, Float, Function
 from .jets import canonical, is_zero
 from .polynomiality import PolynomialityReport, analyze_polynomiality
 from .series import Series, lie_exponential, series_bracket
-from .transform import QuasiMiura, quasitrivialize
+from .transform import QuasiMiura, _fresh_function_names, _function_names, quasitrivialize
 
 
 @dataclass(frozen=True)
@@ -45,22 +45,27 @@ def transport_symmetry(
     space = transform.space
     universal = leading_speeds is None
     reducer = canonical
+    used = _function_names(
+        x for series in (transform.equation, transform.generator)
+        for c in series.coefficients for x in c
+    )
     if family is not None or (universal and space.dimension > 1):
         from .tsarev import TsarevFamily
 
         if family is None:
-            family = TsarevFamily(space, transform.speeds)
+            names = _fresh_function_names(
+                (f"w_{i}" for i in range(space.dimension)), used
+            )
+            family = TsarevFamily(space, transform.speeds, names=names)
         if (not isinstance(family, TsarevFamily) or family.space is not space
                 or family.speeds != transform.speeds):
             raise ValueError("Tsarev family belongs to a different leading system")
+        if used & _function_names(family.values):
+            raise ValueError("generic leader function names collide with input functions")
         leading_speeds = family.values
         reducer = family.reduce
     elif universal:
-        name = scalar_name
-        used = {str(fn.func) for c in transform.equation.coefficients for x in c
-                for fn in x.atoms(Function)}
-        while name in used:
-            name += "_"
+        name, = _fresh_function_names((scalar_name,), used)
         leading_speeds = (Function(name)(space.states[0]),)
     elif space.dimension == 1 and not isinstance(leading_speeds, (tuple, list)):
         leading_speeds = (leading_speeds,)

@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import Iterable
 
-from sympy import Poly, PolynomialError, S, Symbol
+from sympy import Order, Poly, PolynomialError, S, Symbol
 
 from .jets import _expr
 
@@ -51,6 +51,8 @@ class Series:
             if n.is_Integer is not True or n < 1:
                 raise ValueError("the first unknown order must be a positive integer")
             n = int(n)
+            if tail != Order(epsilon**n, (epsilon, 0)):
+                raise ValueError("the remainder must be pure O(epsilon**N)")
             if cutoff is not None and cutoff != n:
                 raise ValueError("all components must share the same cutoff")
             cutoff = n
@@ -75,8 +77,8 @@ class Series:
 
     def as_expr(self, epsilon) -> tuple:
         """Return one SymPy expression per component with the same O term."""
-        from sympy import Order
-
+        if not isinstance(epsilon, Symbol):
+            raise TypeError("epsilon must be a SymPy symbol")
         tail = Order(epsilon**self.cutoff, (epsilon, 0))
         return tuple(
             sum(c[i] * epsilon**k for k, c in enumerate(self.coefficients)) + tail

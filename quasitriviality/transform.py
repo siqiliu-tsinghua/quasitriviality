@@ -1,7 +1,7 @@
 """Compute and verify the first-class quasi-Miura transformation."""
 from dataclasses import dataclass
 
-from sympy import Float, S
+from sympy import Float, Function, S
 
 from .jets import JetSpace, canonical, is_zero
 from .scalar import ScalarPrimitiveError, scalar_primitive
@@ -26,6 +26,23 @@ def _series_equal(left, right):
     )
 
 
+def _function_names(expressions):
+    return {str(fn.func) for expr in expressions for fn in expr.atoms(Function)}
+
+
+def _fresh_function_names(stems, used):
+    occupied = set(used)
+    names = []
+    for name in stems:
+        if not isinstance(name, str) or not name:
+            raise ValueError("symbolic speed names must be nonempty strings")
+        while name in occupied:
+            name += "_"
+        names.append(name)
+        occupied.add(name)
+    return tuple(names)
+
+
 def _leading_speeds(space, equation):
     if equation.dimension != space.dimension:
         raise ValueError("equation dimension does not match the jet space")
@@ -41,7 +58,10 @@ def _leading_speeds(space, equation):
     if space.dimension > 1:
         from .tsarev import TsarevFamily
 
-        TsarevFamily(space, speeds)
+        names = _fresh_function_names(
+            (f"w_{i}" for i in range(space.dimension)), _function_names(speeds)
+        )
+        TsarevFamily(space, speeds, names=names)
     for k, coefficient in enumerate(equation.coefficients):
         for x in coefficient:
             if x.has(Float) or not space.is_homogeneous(x, k+1):
