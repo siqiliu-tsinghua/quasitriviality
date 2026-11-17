@@ -25,7 +25,9 @@
 - [x] Cross-check the CP¹ Toda quasi-Miura map through genus two against
   Dubrovin–Zhang, and compute and verify its genus-three extension.
 - [x] Verify the same three densities in the corrected Toda DZ loop equation.
-- [ ] Add a second Dubrovin–Zhang benchmark and generalize the fast
-  exact Laurent arithmetic beyond the Toda state-gap coefficients.
+- [x] Add the A₂ Boussinesq benchmark through genus three and verify it
+  independently against the DZ loop equation.
+- [ ] Generalize the specialized fast Laurent arithmetic to arbitrary
+  algebraic state coefficients in the core coupled solver.
 - [ ] Consider nondiagonal input and automatic Riemann coordinates only after
   the diagonal pipeline is stable.
