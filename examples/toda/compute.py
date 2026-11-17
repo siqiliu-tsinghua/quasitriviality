@@ -126,7 +126,7 @@ class L(dict):
         return out
     def active(a):return [i for i in range(1+2*N+2) if a.depends(i)]
     def serial(a):
-        return [[[(i,e) for i in range(1+2*N+2) if (e:=power_at(k,i))], str(v)]
+        return [[[[i,e] for i in range(1+2*N+2) if (e:=power_at(k,i))], str(v)]
                 for k,v in sorted(a.items()) if v]
 
 def mono(i,n=1): return L({move_power(ZERO_KEY,i,n):1})
