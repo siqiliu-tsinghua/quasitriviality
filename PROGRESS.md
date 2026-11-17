@@ -136,3 +136,12 @@ and returned the documented cutoff and polynomiality result.
   without poles or logs; homogeneity transfers the check to any
   constant dispersion, including negative values and zero.
 - [Proof and reproduction](examples/a2/SCREEN.md).
+
+## Toda high-order performance benchmark
+
+The centered Toda generator and both maps were computed through
+`O(epsilon^11)` using the existing hodograph solver with an isolated
+packed rational chart. Total construction took 268.753 s with a peak RSS
+of 247.75 MiB. The direct physical reducing identity vanishes through
+epsilon^10, and all coefficients through epsilon^8 reproduced with the
+repository runner. See [per-order timings and reproduction instructions](examples/toda/HIGH_ORDER.md).
