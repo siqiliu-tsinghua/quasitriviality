@@ -145,3 +145,9 @@ packed rational chart. Total construction took 268.753 s with a peak RSS
 of 247.75 MiB. The direct physical reducing identity vanishes through
 epsilon^10, and all coefficients through epsilon^8 reproduced with the
 repository runner. See [per-order timings and reproduction instructions](examples/toda/HIGH_ORDER.md).
+
+The same ten-order dressing map now also passes the corrected CP¹ DZ loop
+equation through genus five (ε⁸ in the loop equation). F₄ and F₅ have 1,824
+and 9,199 terms. All three tau identities and two independent exact loop
+residual computations passed; each misprint and a genus-five mutation
+were detected. See [the extended loop check](examples/toda/LOOP_EQUATION.md).

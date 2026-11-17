@@ -109,3 +109,63 @@ Restoring just the printed prefactor of the last block gives nonzero
 residuals at genera two and three. Changing a highest-jet term of
 the archived genus-three density leaves genera one and two unchanged,
 but fails the genus-three check.
+
+## From the ten-order quasi-Miura map through genus five
+
+The new check starts from the unchanged centered Toda dressing map through
+O(ε¹¹), not from a guessed genus expansion or an existing solution of the
+loop equation. With `B=(epsilon D_x)/(2 sinh(epsilon D_x/2))`, the flat
+tau coordinates are `V_tau=B V` and `U_tau=B² U`. We apply the shifts
+to the dressing map and integrate each coefficient of `U_tau` twice
+with exact total derivatives. For F₁ the known logarithmic density is
+checked directly. At every genus we verify the three independent identities
+
+```text
+[epsilon^(2g)] U_tau      = D_x² F_g
+[epsilon^(2g)] V_tau      = D_x E_0 F_g
+[epsilon^(2g)] exp(U)     = E_0² F_g
+```
+
+where `E_0` is the dispersionless Toda evolution. The resulting F₂ and F₃
+are identical to the earlier archive. The higher free energies have
+1,824 terms (maximum jet order 10) and 9,199 terms (maximum jet order 13),
+respectively. The exact rational data are in
+[`toda-free-energies-g1-g5.json`](toda-free-energies-g1-g5.json).
+
+We check the same two substantive errata above. In the Laurent
+verifier, set `y²=(s−λ)/(r−λ)`. Thus
+`a=d(1+y²)/(2(1−y²))`, `1/sqrt(𝒟)=(1−y²)/(d y)`, and at fixed λ
+`D_x y=(1−y²)(s_x−y² r_x)/(2 d y)`. This is an exact change of spectral
+function field, not sampling. The flat Hessian is evaluated as
+`E_A²−E_(E_A A−B_curv)`, where A is the canonical pushforward of the
+differentiated flat period vector and `B_curv` the second variation of
+the canonical coordinates in the same frozen flat direction.
+The full residual is zero coefficientwise in the Laurent ring:
+
+| Genus | Loop coefficient | Nonzero residual coefficients |
+| --- | --- | ---: |
+| 1 | ε⁰ | 0 |
+| 2 | ε² | 0 |
+| 3 | ε⁴ | 0 |
+| 4 | ε⁶ | 0 |
+| 5 | ε⁸ | 0 |
+
+The separate flat-partial verifier independently gave zero after
+multiplying the five residuals by 𝒟², 𝒟⁵, 𝒟⁸, 𝒟¹¹ and 𝒟¹⁴. It keeps
+both errata as switches for regression tests. The measured wall times
+were approximately 41 s for the Laurent check and 297 s for ordinary
+denominator clearing.
+Restoring either misprint is detected. A separate linearity control
+removing the term `d⁴ D_x¹³r/(15288238080 r_x⁵)` from F₅ leaves genera
+1–4 unchanged but yields 35,783 nonzero terms in the cleared genus-five
+residual. The assay does not test genus six: the map cutoff supplies
+`DeltaF` only through ε⁸.
+
+```sh
+# Regenerate densities from the centered map, if desired:
+python -m examples.toda.high_free_energy /tmp/toda-epsilon10.json -o /tmp/densities.json
+# Verify the tracked exact data in the Laurent chart:
+python -m examples.toda.high_loop_canonical
+# Verify with ordinary spectral denominator clearing:
+python -m examples.toda.high_loop_equation
+```
