@@ -43,3 +43,22 @@
 - Record symbolic residuals and changes of variables; ensure cancellation
   of jet poles in the transported flows. Add a reproducible check and
   regression test.
+
+## High-order performance experiment
+
+1. Extend the same centered Toda input to `O(epsilon^11)`. Generate the
+   homological sources by a truncated adjoint recurrence, solve each with
+   the existing hodograph quadrature, and exponentiate the same generator
+   in both directions. Use a larger private sparse chart without changing
+   the variable indices of the archived six-order results.
+2. In one fresh single-process run, record elapsed wall time for each
+   positive even coefficient, cumulative time, and the process high-water
+   RSS at the end of each coefficient. Finish both map directions before
+   stopping the timer for each coefficient. Keep checks intrinsic to the
+   homological inversion timed; perform archive export and the additional
+   direct PDE check separately.
+3. Compare the first three map and generator coefficients to the exact
+   archive, verify the reducing chain rule in physical jets through the
+   new cutoff, and record the command, numbers, and scope of the test.
+   Free energies, secondary flows, and loop identities at the new orders
+   are not part of this experiment.
