@@ -51,3 +51,38 @@ at every order through 10; the order-10 check took about 21 seconds.
 The dressing map is the inverse by construction (exponentiation of the
 same derivation with opposite sign). The exported JSON stores all
 rational coefficients and the jet-index basis.
+
+## Independent DZ check of the highest derivatives
+
+```sh
+python -m examples.toda.check_dz_top_jets /tmp/toda-epsilon10.json
+```
+
+[Shadrin–Wang, Theorem 1.1](https://arxiv.org/pdf/2405.00276#page=3)
+expresses the dependence of $F_g$ on the jets of order $3g-2$ in terms of
+the point-theory energy weighted by $f_i^{1-g}$ for each canonical metric
+entry $f_i$. The coefficient of the highest jet in the point theory is
+$1/(24^g g! u_x^g)$, by the one-point intersection number. At genus 1
+the same formula means the derivative of $\log |u_x|/24$ with respect
+to $u_x$. For Toda the flat metric $2\,dU\,dV$ gives
+$f_r=2/\Delta$, $f_s=-2/\Delta$, where $\Delta=r-s$. Thus the entire
+jet-order-$3g$ slice of $D_x^2 F_g$ should be
+[
+  \frac{\Delta^{g-1}}{2^{g-1}24^g g!}
+  \left(\frac{D_x^{3g}r}{r_x^g}
+        +(-1)^{g-1}\frac{D_x^{3g}s}{s_x^g}\right).
+]
+Recover that slice from the two canonical dressing components by
+linearizing $U=2\log((r-s)/4)$ at the dispersionless gap. Products of
+lower-order corrections have jet order strictly less than $3g$. The
+gauge change $B^2=\left(\epsilon D_x/(2\sinh(\epsilon D_x/2))\right)^2$
+does not affect this slice: its order-$2(g-h)$ term applied to the
+order-$2h$ correction has jet order at most $3h+2(g-h)<3g$ for $h<g$
+(including the dispersionless term).
+
+All five slices match exactly, with no additional terms at these jet
+orders. In particular, the scalar factors multiplying
+$\Delta^{g-1}$ at genera 4 and 5 are $1/63700992$ and $1/15288238080$.
+Deleting one highest-jet term in the genus-5 archive triggers a
+mismatch. This check does not reconstruct $F_4,F_5$ or verify the full
+loop equation at those genera.
