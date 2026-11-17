@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quasitriviality"
+version = "0.1.0"
+description = "Formal quasi-Miura transforms and integrability tests in SymPy"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["sympy>=1.12,<2"]
+
+[tool.setuptools.packages.find]
+include = ["quasitriviality"]
