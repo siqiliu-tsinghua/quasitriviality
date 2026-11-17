@@ -24,6 +24,7 @@
   coefficient singularities and parameter specializations.
 - [x] Cross-check the CP¹ Toda quasi-Miura map through genus two against
   Dubrovin–Zhang, and compute and verify its genus-three extension.
+- [x] Verify the same three densities in the corrected Toda DZ loop equation.
 - [ ] Add a second Dubrovin–Zhang benchmark and generalize the fast
   exact Laurent arithmetic beyond the Toda state-gap coefficients.
 - [ ] Consider nondiagonal input and automatic Riemann coordinates only after

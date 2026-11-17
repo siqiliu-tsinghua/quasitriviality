@@ -117,3 +117,9 @@ standard SymPy solver on the first nonzero correction.
 to two higher ordinary flows and the first nontranslation logarithmic
 flow. The complete coefficients are in
 [toda-symmetries-epsilon6.json](toda-symmetries-epsilon6.json).
+
+## DZ loop-equation check
+
+The prior free energies also satisfy the independently specialized DZ
+loop equation through genus three. See [the corrections to (3.10.102),
+exact residuals, and reproduction command](LOOP_EQUATION.md).
