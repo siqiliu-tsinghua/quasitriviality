@@ -120,3 +120,9 @@ PYTHONDONTWRITEBYTECODE=1 python -m unittest tests.test_a2 -v
 
 All statements are formal and finite-order, not a claim about convergence
 or genera above three.
+
+## Perturbation experiment
+
+The [exact screen](SCREEN.md) varies the three order-two coefficient
+functions, locates the first obstructions and solves all power-law
+branches of the truncated family.

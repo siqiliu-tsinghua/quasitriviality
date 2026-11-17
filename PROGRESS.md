@@ -121,3 +121,18 @@ and returned the documented cutoff and polynomiality result.
   genus-two formulas matched termwise. The generic SymPy coupled solver
   also agrees with the sparse result at the first dispersive order.
 - [Formulas, assumptions, and reproduction](examples/a2/README.md).
+
+## 2026-11-17: A₂ third-derivative perturbation screen
+
+- For exact truncated inputs `A(U) U_xxx+B(U) U_xx U_x+C(U) U_x³`
+  at ε², the triangular quasi-Miura residuals require
+  `A′=B′=C=0`, then `B²=0` at ε⁴.
+- An independent flat polynomial lift of the nontrivial principal
+  symmetry gives the same conditions, ruling out incompatibility
+  artifacts from the chosen primitive representation.
+- The complete power-law answer, including zero amplitudes, is
+  `(A,B,C)=(constant,0,0)`. The original `A=1/4` is included.
+  The generic Tsarev lift was verified in physical jets to `O(ε⁷)`
+  without poles or logs; homogeneity transfers the check to any
+  constant dispersion, including negative values and zero.
+- [Proof and reproduction](examples/a2/SCREEN.md).
