@@ -53,15 +53,29 @@ and a genuinely coupled two-component example through `O(ε³)`.
 
 - Scalar solving uses exact Laurent–log quadrature for the nondegenerate
   leading speed `f(u)u_x`; coefficients depend on state and parameters.
-- The coupled path supports diagonal semihamiltonian leading systems in
-  Riemann coordinates. It uses the Lean-style inverse jet chart and a verified
-  finite-span solver, **not a general smooth homological/Darboux inverse**.
-  The default searches homogeneous polynomial jets with constant
-  coefficients. Supply `CoupledSolver(state_basis=..., extra_candidates=...)`
-  to widen the search; finite Laurent powers and formal-log degrees are
-  separately configurable. Every candidate solution is checked in physical
-  jets. A failed search raises `UnresolvedTransformation` with its order and
-  residual, not a conclusion of nonintegrability.
+- The coupled path takes diagonal semi-Hamiltonian systems in Riemann
+  coordinates. The generalized hodograph action determines each unknown
+  top transverse derivative and top own-jet coefficient. Integrate these
+  exactly, descending jet orders, with no candidate generator basis or
+  guessed exponents. The input is the equation, not an already known
+  symmetry lift.
+- A weight-one generator can need a state-dependent correction. The
+  program checks the residual shape and affine Darboux compatibility.
+  It uses exact quadrature in decoupled cases, and otherwise defines the
+  correction by the exact local radial Volterra integral equation with
+  zero axis data. For the two-component inverse-difference case,
+  `DarbouxProblem.difference_solution()` also gives a finite quadrature.
+  For the latter no finite approximation is substituted for the solution.
+  Supply a regular coordinate basepoint with
+  `quasitrivialize(jets, equation, solver=CoupledSolver(basepoint=(...)))`;
+  by default the basepoint is symbolic. Choose a sufficiently small
+  nonsingular cube centered there. `volterra_definitions(*coefficients)`
+  retrieves the defining problems from returned SymPy expressions.
+- Every answer is checked in physical jets. `UnresolvedTransformation`
+  reports a failed step and its order and residual, not a conclusion
+  of nonintegrability. Finite Laurent–log jet support is required;
+  no global solution or elementary closed form for arbitrary
+  smooth state functions is promised.
 - Pick a local domain where speed differences, self-derivatives and any
   denominators in the answer are nonzero. Logs are formal first-jet
   logarithms, represented by `jets.log(i)`. The package does not select
@@ -77,6 +91,7 @@ and a genuinely coupled two-component example through `O(ε³)`.
 - [ARCHITECTURE.md](ARCHITECTURE.md): conventions, operations and result contract.
 - [DEVELOPMENT.md](DEVELOPMENT.md): implementation and verification protocol.
 - [PLAN.md](PLAN.md): milestone sequence and acceptance tests.
+- [CONSTRUCTIVE_PLAN.md](CONSTRUCTIVE_PLAN.md): the revised coupled algorithm.
 - [TODO.md](TODO.md): actionable backlog.
 - [PROGRESS.md](PROGRESS.md): current status and verification history.
 

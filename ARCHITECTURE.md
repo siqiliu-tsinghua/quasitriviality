@@ -94,19 +94,34 @@ Relevant Lean sources under `SemiHamiltonian/Jet/`:
 `HodographSubstitution.lean`, `HodographConjugacy.lean`,
 `NormalizedCharacteristic.lean`, `NormalizedBracket.lean`,
 `NormalizationStep.lean` and `HomologicalExactness.lean`.
-Use the latter together with its cocycle and Darboux lemmas for the
-solvability contract. In the Lean constructive route, *compatible
-Tsarev homological lifts* are the input to recovering a common
-primitive: isolate the free-jet parts, check closure, integrate the
-vertical one-form, and handle the degree-two residual through the
-inhomogeneous Darboux equation when needed. This is not a right
-inverse on arbitrary inputs. The public pipeline remains transform
-first: internal lift data used to construct the primitive do not
-replace the later calculation of the transported symmetry. Specify
-which restricted coefficient classes and Darboux cases have an exact
-symbolic solver. If a solution cannot be computed, return an identified
-unresolved step, or a certified incompatibility when there is one.
-Do not label solver failure as nonintegrability.
+Lean uses an all-Tsarev cocycle in the homological existence proof:
+integrate the closed vertical form in the positive inverse jets, then
+solve the remaining affine Darboux equation in weight one. The optional
+`primitive_from_lift` independently reproduces this when a generic lift
+is known. It is not needed by the equation-only API.
+
+In the equation-only construction, write `A_v H = S` in the same chart.
+The coefficient of the next transverse jet is the positive-jet
+partial derivative of `H_i` times the speed gap over `z_j,1`. Taking
+its zero-constant primitive strips transverse dependence. In the same
+order, the unknown positive powers of the own jet reduce to scalar
+shifted transport at lower order. Its weight stays positive; hence an
+own leading power cannot disappear from the projected source. At the
+bottom, solve the projected Euler–log equation, permitting just a
+state-only remainder in weight zero. The full descent and multiplier
+shifts are specified in [CONSTRUCTIVE_PLAN.md](CONSTRUCTIVE_PLAN.md).
+
+The remaining state system, when needed, is
+`∂_j h_i = Γ_ij (h_j − h_i) + f_ij`. The reference's radial Volterra
+operator supplies an exact local definition `h = (I−T)^−1 A`, with the
+basepoint, forcing, radial integrals and derivative identities retained.
+On a small enough regular cube the operator is contractive; the
+compatibility check allows using the affine Darboux equations as
+exact differentiation rules. Decoupled cases use finite quadratures.
+A special two-component finite quadrature is available with a different gauge.
+This is not a right inverse on arbitrary sources: verify residuals and
+the physical bracket, and keep failed construction separate from the
+polynomiality test.
 
 ## 4. Symmetry and integrability conditions
 

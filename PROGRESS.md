@@ -27,3 +27,30 @@ verification. Changes are committed locally in documented stages.
 Verification on Python 3.12.14 / SymPy 1.14.0: all **51 tests passed**
 in the full discovery run. The README example was executed separately
 and returned the documented cutoff and polynomiality result.
+
+## 2026-11-17: constructive coupled revision
+
+- Re-read the Lean normalized action, order and transport lemmas, the
+  free-jet cocycle integration, and the inhomogeneous Darboux construction.
+  The earlier finite-span implementation above is superseded and has been
+  removed. The plan was committed first as `18be940`.
+- The default coupled solver now integrates the uniquely forced highest
+  transverse jet partials, then recovers own-jet powers by lower-order
+  scalar transport. At degree one it checks the state-only Darboux
+  remainder and returns a verified primitive. General state coefficients
+  defined by the local Volterra equation are exact integral representations,
+  not truncated approximations or freely chosen unknown functions.
+- End-to-end scope remains transform first, including the inverse, then
+  arbitrary Tsarev symmetry transport and polynomiality at the same cutoff.
+  No input symmetry lift is required. The separate cocycle test recovers
+  the same positive-weight Laurent–log primitive from a known generic lift.
+- Full checkout run: `PYTHONDONTWRITEBYTECODE=1 python -m unittest discover -v`,
+  Python 3.12.14 / SymPy 1.14.0, **69 tests passed** in 99.751 seconds.
+  In addition to scalar regressions, tests cover two- and three-component
+  coupling, exact Laurent–log recovery with arbitrary state coefficients,
+  compatible and incompatible Darboux data, and singular basepoint rejection.
+- Separately executed the README Burgers example and an end-to-end
+  non-inverse-difference coupled example,
+  `v=(2r+3s,r+2s)` with basepoint `(1,0)`, at `O(ε³)`. It returned
+  one Volterra definition for the transformation and a polynomial
+  transported generic Tsarev symmetry at the same cutoff.

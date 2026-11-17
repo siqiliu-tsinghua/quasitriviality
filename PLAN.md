@@ -35,12 +35,13 @@ symmetry without recomputing it.
 2. Build a representation of generic Tsarev data with constrained
    transverse derivatives and free pure derivatives. Demonstrate closure
    under the differentiation needed at the requested cutoff.
-3. Implement and document a coupled homological solver for a clearly stated
-   supported class. Recover a common potential in the compatible cases using
-   the Lean construction or an independently certified solve. Treat the
-   degree-two Darboux step explicitly: first support tractable symbolic
-   instances, and expose unresolved equations rather than claiming a general
-   closed-form solver.
+3. Implement the constructive recurrence in
+   [CONSTRUCTIVE_PLAN.md](CONSTRUCTIVE_PLAN.md). Descend the forced
+   transverse derivatives and own-jet coefficients in normalized jets.
+   Treat the degree-two source's Darboux step explicitly, including the
+   exact local radial integral representation when a finite quadrature
+   is not available. Do not use an ansatz search, or require the user to
+   provide an already known symmetry lift.
 4. Verify the full pipeline on a genuinely coupled manufactured example.
    Candidate: `v=(2r+s,r+2s)` on `r≠s`,
    `w=grad((A(r)+B(s))/(r−s))` with independent arbitrary functions,
@@ -76,5 +77,5 @@ Add explicit DZ examples and compare the computed transformation with
 known free-energy-derived formulas at matched orders. Record conventions
 and normalization on both sides and account for gauge before comparing.
 This is cross-validation, not an assumption or first-stage dependency.
-Increased coverage of coupled solvers and general nondiagonal input can
-be planned after the supported Phase 1 slice works.
+Coverage of coefficient domains and general nondiagonal input can be
+planned after the diagonal pipeline is stable.

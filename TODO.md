@@ -9,15 +9,17 @@
   without Hopf point normalization; return and verify both directions.
 - [x] Reuse the transform for arbitrary leading symmetries and report
   jet-polynomiality conditions in physical jets.
-- [x] Build the coupled Tsarev family reduction and a verified bounded
-  homological solve in a supported class.
+- [x] Build the coupled Tsarev family reduction and deterministic
+  homological quadratures, including the affine Darboux residual.
+- [x] Cross-check the equation-only inverse against the Lean-style
+  positive free-jet cocycle construction for a known generic lift.
 - [x] Test independent scalar benchmarks, a negative polynomiality case,
   and a genuinely coupled manufactured example through `O(ε³)`.
 
 ## Next extensions
 
-- [ ] Extend the coupled solver beyond finite ansatz spaces with the Lean
-  cocycle reconstruction and compatible Darboux primitive as applicable.
+- [ ] Add more explicit state-space quadrature reductions and support
+  for inspecting or evaluating the exact local Volterra representation.
 - [ ] Increase supported domains and implement better accounting of
   coefficient singularities and parameter specializations.
 - [ ] Collect Dubrovin–Zhang free-energy examples, align gauges and compare

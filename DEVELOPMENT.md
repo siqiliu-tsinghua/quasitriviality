@@ -15,12 +15,12 @@ source usable from a checkout and package it with pyproject.toml.
 3. Symmetry and obstruction API: transport arbitrary symbolic leaders by
    the same generator, verify commutation to the input cutoff, and classify
    physical-jet polynomiality separately. Add examples and regression tests.
-4. Coupled hodograph and a supported coupled solver: implement the triangular
-   jet chart and transported bracket directly from Lean; use a bounded exact
-   construction for a documented tractable class and verify its witnesses in
-   physical jets. Outside the supported search report an unresolved step,
-   never infer nonexistence. Check a genuinely coupled example and its
-   symbolic Tsarev family. The general smooth Darboux solver is not promised.
+4. Coupled hodograph and constructive primitives: port the normalized
+   action, invert its forced positive-jet transport by descending exact
+   integrals, and solve the affine state-only Darboux remainder when present.
+   Verify in physical jets and on the symbolic Tsarev family. See
+   [CONSTRUCTIVE_PLAN.md](CONSTRUCTIVE_PLAN.md) for the separate commits and
+   acceptance checks for this replacement.
 5. Run the complete suite, check reproducible usage examples, record
    implemented support and limitations, and commit final documentation.
 

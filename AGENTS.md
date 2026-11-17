@@ -14,7 +14,8 @@ and [PROGRESS.md](PROGRESS.md) before choosing the next task.
   transported symmetry is not polynomial.
 - Preserve the leading speeds in the input coordinates. Use Joel’s adapted
   hodograph integration for one component; use the Lean reference’s generalized
-  hodograph jets and normalized action for multiple components. Do not assume
+  hodograph jets and normalized action for multiple components. Construct by
+  integration; do not enumerate candidates or impose a guessed jet basis. Do not assume
   coupled speeds can be made into independent Hopf coordinates.
 - Work formally to an explicit cutoff. Input `O(ε^N)` means the coefficient of
   `ε^N` and everything above it are unknown. Do not silently set them to zero
