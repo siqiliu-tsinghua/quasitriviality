@@ -1,43 +1,26 @@
 # TODO
 
-## Development setup
+## Phase 1: implemented and tested
 
-- [ ] Choose supported Python and SymPy versions and a test runner.
-- [ ] Define package layout, input/output notation and cutoff metadata.
-- [ ] Add small fixtures derived independently of the implementation.
+- [x] Document the scope, formal cutoff, and direction of the transform.
+- [x] Implement exact physical and hodograph jet algebra, formal logs,
+  total/evolutionary derivations, brackets, and truncated Lie actions.
+- [x] Compute the scalar transformation directly in the original state,
+  without Hopf point normalization; return and verify both directions.
+- [x] Reuse the transform for arbitrary leading symmetries and report
+  jet-polynomiality conditions in physical jets.
+- [x] Build the coupled Tsarev family reduction and a verified bounded
+  homological solve in a supported class.
+- [x] Test independent scalar benchmarks, a negative polynomiality case,
+  and a genuinely coupled manufactured example through `O(ε³)`.
 
-## Phase 1A: scalar
+## Next extensions
 
-- [ ] Implement and test weighted physical jets, `Dₓ`, evolutionary
-      derivations, formal logs and the bracket.
-- [ ] Implement exact series truncation and Lie action with the physical
-      `O(ε^N)` convention.
-- [ ] Implement inverse jets, Joel invariants and exact
-      Laurent–log primitives without a Hopf point normalization.
-- [ ] Construct the graded generator and reducing substitution; record
-      normalization and verify both the Lie and substitution identities.
-- [ ] Transport a symbolic arbitrary `h` and verify the commutator.
-- [ ] Separate polynomiality from commutation; extract order/component
-      conditions after cancellation in physical jets.
-- [ ] Test boundary cutoffs, non-Hopf speed, log cancellation, KdV,
-      Burgers and a nonintegrable scalar fixture.
-
-## Phase 1B: coupled
-
-- [ ] Translate the Lean recurrences for Tsarev coefficients, hodograph
-      jets and the normalized bracket; test scalar degeneration and a
-      genuinely coupled chart.
-- [ ] Encode pure free jets and reduce mixed derivatives with Tsarev
-      equations; test against the explicit two-component family.
-- [ ] Determine a supported symbolic strategy for a common primitive,
-      including the degree-two Darboux residual. Document conditions
-      for exact success, certified incompatibility and unresolved output.
-- [ ] Verify and document the manufactured coupled fixture with arbitrary
-      `A,B`, plus an unsupported or obstructed case.
-
-## Deferred
-
-- [ ] Collect DZ/free-energy examples, pin source formulas, align gauges
-      and compare the transforms order by order.
-- [ ] Extend symbolic coverage and consider automatic Riemann coordinates
-      for nondiagonal inputs only after the diagonal pipeline is stable.
+- [ ] Extend the coupled solver beyond finite ansatz spaces with the Lean
+  cocycle reconstruction and compatible Darboux primitive as applicable.
+- [ ] Increase supported domains and implement better accounting of
+  coefficient singularities and parameter specializations.
+- [ ] Collect Dubrovin–Zhang free-energy examples, align gauges and compare
+  quasi-Miura transformations order by order.
+- [ ] Consider nondiagonal input and automatic Riemann coordinates only after
+  the diagonal pipeline is stable.
