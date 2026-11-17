@@ -62,3 +62,18 @@
    new cutoff, and record the command, numbers, and scope of the test.
    Free energies, secondary flows, and loop identities at the new orders
    are not part of this experiment.
+
+## CP¹ loop cross-check through genus five
+
+- Start with the unchanged O(ε¹¹) centered dressing map. Apply the established
+  shifts B and B² to its flat coordinates, extract F₂–F₅ by two exact total
+  primitives, and verify the two coordinate tau identities and the t,t
+  identity at each genus. F₁ is the known density checked against this map.
+- Extend the previous CP¹ check of the corrected DZ equation to the
+  coefficients of ε⁶ and ε⁸, using only these recovered densities. Reuse the
+  verified period kernels and both corrections to (3.10.102); compare over
+  the exact jet and spectral function field, not at sample values.
+- Recheck the earlier three genera and include independent checks that each
+  restored misprint and a changed high-genus density are detected. Publish
+  the exact computed densities and record the scope, inputs and reproduction
+  steps. Do not infer a genus-six identity from the cutoff.
