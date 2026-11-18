@@ -154,3 +154,22 @@ equation through genus five (ε⁸ in the loop equation). F₄ and F₅ have 1,8
 and 9,199 terms. All three tau identities and two independent exact loop
 residual computations passed; each misprint and a genus-five mutation
 were detected. See [the extended loop check](examples/toda/LOOP_EQUATION.md).
+
+## 2026-11-18: open-source release preparation
+
+- Reviewed tracked files and reachable Git history for credentials, private
+  links and bundled reference material. No matches in the targeted scan.
+  The algorithmic references are attributed in the README; their source
+  files are not part of the Git or package history.
+- Secured public symbolic helpers against implicit expression-string parsing
+  and added focused input-validation tests without changing the numerical
+  or symbolic algorithms. Documented the trusted-local input boundary in
+  [SECURITY.md](SECURITY.md).
+- Added the MIT license and SPDX metadata. The source distribution and
+  wheel both included the license, and the README example passed using
+  the installed wheel. The minimum Python is now 3.11 because
+  [Python 3.10 has reached end of life](https://devguide.python.org/versions/).
+- Validated the GitHub-style math syntax and local Markdown links. Full
+  suite on Python 3.12.14 / SymPy 1.14.0: **93 tests passed**. A final live
+  GitHub preview can be done once there is a repository there; see
+  [RELEASING.md](RELEASING.md).
