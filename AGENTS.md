@@ -2,8 +2,9 @@
 
 This project implements a symbolic, finite-order quasi-Miura construction and
 formal integrability test in Python/SymPy. Read [ARCHITECTURE.md](ARCHITECTURE.md)
-for conventions, [PLAN.md](PLAN.md) for acceptance criteria, and [TODO.md](TODO.md)
-and [PROGRESS.md](PROGRESS.md) before choosing the next task.
+for conventions, [PLAN.md](PLAN.md) for original acceptance criteria,
+and [TODO.md](TODO.md) and [PROGRESS.md](PROGRESS.md) for current limits and
+verification history. See [RELEASING.md](RELEASING.md) for packaging checks.
 
 ## Mathematical requirements
 
@@ -42,4 +43,4 @@ and [PROGRESS.md](PROGRESS.md) before choosing the next task.
   runtime dependencies. Do not edit the reference copies or rely on Mathematica
   being installed. Prefer a fresh implementation to copying reference code.
 - Keep examples exact and record their assumptions and order. Update
-  `PROGRESS.md` with what actually ran and `TODO.md` with unresolved work.
+  `PROGRESS.md` with what actually ran and `TODO.md` with known limitations.

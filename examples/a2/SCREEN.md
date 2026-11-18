@@ -1,6 +1,6 @@
 # A₂ integrability screen for a general third-derivative perturbation
 
-On a connected domain with `U>0), consider the exact truncated system
+On a connected domain with `U>0`, consider the exact truncated system
 
 ```text
 U_t = V_x,

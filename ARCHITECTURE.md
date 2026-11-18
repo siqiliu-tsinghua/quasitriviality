@@ -14,7 +14,7 @@ to their `O(ε^(N+1))` for the rescaled characteristic.
 
 A leading symmetry is `Y₀ⁱ = wⁱ(u) uₓⁱ`. For one component `w=h(u)`
 is an arbitrary smooth function. In several components it is any
-Tsarev speed: `∂ⱼwⁱ = Γᵢⱼ(wʲ−wⁱ)` for `i≠j), with
+Tsarev speed: `∂ⱼwⁱ = Γᵢⱼ(wʲ−wⁱ)` for `i≠j`, with
 `Γᵢⱼ = (∂ⱼvⁱ)/(vʲ−vⁱ)`. For universal tests represent this constrained
 family symbolically, for example by values and free pure derivatives
 with transverse derivatives reduced using Tsarev's equations. A particular
@@ -22,7 +22,7 @@ admissible `w` is useful for testing, but certifies only that choice.
 For the coupled case assume a semihamiltonian diagonal leading system,
 pairwise distinct velocities and nonvanishing `∂ᵢvⁱ` on the domain.
 Scalar assumptions reduce to `f′(u) ≠ 0`. General matrix input and finding
-Riemann coordinates are not part of the initial interface.
+Riemann coordinates are not part of the supported interface.
 
 An order-aware series stores the **first unknown** order. All requested
 results are modulo `ε^N`; no series result claims a coefficient outside
@@ -39,7 +39,7 @@ polynomial dependence on formal `ℓᵢ=log|pᵢ|`, with
 `∂ℓᵢ/∂pᵢ=1/pᵢ`. Do not use branch-sensitive log rewrites without an
 explicit assumption or a formal rule.
 
-Implement total differentiation `Dₓ` and evolutionary derivations
+The implementation uses total differentiation `Dₓ` and evolutionary derivations
 `E_Q = Σᵢ,s Dₓ^s(Qⁱ) ∂/∂uⁱ_(s)`, where `s=0` acts on the states.
 Use the same bracket convention as the reference code:
 `[Q,P] = E_Q(P) − E_P(Q)`. Truncated convolution and Lie exponential
@@ -118,7 +118,13 @@ basepoint, forcing, radial integrals and derivative identities retained.
 On a small enough regular cube the operator is contractive; the
 compatibility check allows using the affine Darboux equations as
 exact differentiation rules. Decoupled cases use finite quadratures.
-A special two-component finite quadrature is available with a different gauge.
+The opt-in `DarbouxProblem.difference_solution()` supplies a finite
+quadrature with a different gauge for the two-component inverse-difference
+case `Γ₀₁=−1/(r−s)`, `Γ₁₀=1/(r−s)`. The default
+`CoupledSolver(basepoint=(...))` accepts a regular coordinate basepoint
+and otherwise uses a symbolic one. Choose a small regular cube about it.
+Use `volterra_definitions(*coefficients)` on individual SymPy expressions,
+not nested series tuples, to recover their defining problems.
 This is not a right inverse on arbitrary sources: verify residuals and
 the physical bracket, and keep failed construction separate from the
 polynomiality test.
@@ -137,9 +143,8 @@ obstruction. Independence of the free data justifies coefficient
 splitting; do not assume all mixed derivatives are independent.
 
 Return the transformation and the transported symmetry whether or not
-the latter is polynomial. Optionally return order-, component- and
-monomial-tagged conditions for their polynomiality, with statuses such
-as verified through cutoff, obstructed, parameter conditions required,
-or undetermined. An unevaluated integral or unresolved simplification
+the latter is polynomial. The result contains order-, component- and
+monomial-tagged conditions, with status `polynomial`, `obstructed`,
+`conditional`, or `undetermined`. An unevaluated integral or unresolved simplification
 is not proof of a nonpolynomial term. Agreement to a finite order is
 not a conclusion about all orders or about convergence.

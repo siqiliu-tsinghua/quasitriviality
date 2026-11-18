@@ -11,8 +11,10 @@ $U=u$, $V=e^{-\epsilon D_x/2}v$, and $r,s=V\pm2e^{U/2}$.
 The centered shift multiplier is
 $2\sinh(z/2)/z=\sum_{m\geq0}z^{2m}/(2^{2m}(2m+1)!)$.
 The equations and both maps are therefore even in ε. No free energies are
-used as inputs, and no free energies, loop equations, or secondary flows
-are computed for this benchmark.
+used as inputs. The timed map construction excludes free-energy
+extraction, loop checks, and secondary flows. The separate
+[loop check](LOOP_EQUATION.md#from-the-ten-order-quasi-miura-map-through-genus-five)
+extracts the densities through genus five from the resulting map.
 
 For the truncated generator $G$, the source at order $n$ is the input
 flow coefficient minus the order-$n$ part of
@@ -67,11 +69,11 @@ the same formula means the derivative of $\log |u_x|/24$ with respect
 to $u_x$. For Toda the flat metric $2\,dU\,dV$ gives
 $f_r=2/\Delta$, $f_s=-2/\Delta$, where $\Delta=r-s$. Thus the entire
 jet-order-$3g$ slice of $D_x^2 F_g$ should be
-[
+$$
   \frac{\Delta^{g-1}}{2^{g-1}24^g g!}
   \left(\frac{D_x^{3g}r}{r_x^g}
         +(-1)^{g-1}\frac{D_x^{3g}s}{s_x^g}\right).
-]
+$$
 Recover that slice from the two canonical dressing components by
 linearizing $U=2\log((r-s)/4)$ at the dispersionless gap. Products of
 lower-order corrections have jet order strictly less than $3g$. The

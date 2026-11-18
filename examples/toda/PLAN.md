@@ -1,5 +1,8 @@
 # Toda / CP1 cross-validation through O(epsilon^7)
 
+This document records the completed benchmark plan. The example pages
+contain the implementation results and reproduction commands.
+
 1. Start from the shift identities of Carlet–Dubrovin–Zhang (2.14), not
    the inconsistent printed backward Taylor sign. Keep all raw powers
    through epsilon^6. Center the shift using V=exp(−epsilon D/2)v, U=u,

@@ -1,19 +1,23 @@
 # quasitriviality
 
-A SymPy tool for constructing quasi-Miura transformations, transporting
-arbitrary dispersionless symmetries, and extracting finite-order integrability
-conditions for evolutionary PDEs.
+Exact, finite-order quasi-Miura transformations and symmetry tests for
+evolutionary PDEs, written in Python and SymPy.
 
-Given an equation through `O(ε^N)`, the package returns a verified
-quasi-Miura transformation and a symmetry for an arbitrary admissible leader
-through the **same** `O(ε^N)`. The transformation is itself a research
-output, not just an intermediate calculation. Its relation to free energies in
-Dubrovin–Zhang theory motivates later cross-validation; a DZ or bihamiltonian
-structure is not required.
+Start with a flow $X=X_0+\sum_{k=1}^{N-1}\epsilon^k X_k+O(\epsilon^N)$.
+On supported inputs, the package constructs a verified transformation and
+its inverse, then uses the **same** transformation to transport an
+admissible dispersionless symmetry. It verifies commutation and reports
+jet polynomiality separately. Every result has the input's cutoff:
+$O(\epsilon^N)$ means the coefficient of $\epsilon^N$ is the first unknown.
 
-## Quick start
+## Install and run
 
-From the repository root with SymPy installed, or after `pip install -e .`:
+Python 3.11 or newer is required. From a checkout, preferably in a virtual
+environment:
+
+```sh
+python -m pip install .
+```
 
 ```python
 from sympy import O, Symbol
@@ -27,94 +31,78 @@ equation = Series.from_expr(u * ux + eps * uxx + O(eps**3), eps)
 
 result = check_integrability(jets, equation)
 T = result.transformation
-print(T.reducing.as_expr(eps)[0])          # v=T(u), through O(eps**3)
-print(T.inverse.as_expr(eps)[0])           # u=T^{-1}(v) with same cutoff
-print(result.symmetry.symmetry.as_expr(eps)[0])  # arbitrary h(u)
+print(T.reducing.as_expr(eps)[0])                # v = T(u)
+print(T.inverse.as_expr(eps)[0])                 # inverse at the same cutoff
+print(result.symmetry.symmetry.as_expr(eps)[0])  # arbitrary leading h(u) * ux
 print(result.symmetry.polynomiality.status.value)  # polynomial
 
-# Reuse exactly the same transformation with a selected leader.
-specific = transport_symmetry(T, u**2)
+specific = transport_symmetry(T, u**2)          # leading u**2 * ux
 ```
 
-For several components use e.g. `JetSpace(("r", "s"))` and pass one
-expression per component to `Series.from_expr`; each needs the same explicit
-big-O. Inputs must be constructed as SymPy expressions, with jet symbols
-from the `JetSpace` factory. Default symmetry transport keeps arbitrary
-local Tsarev speed values and their free pure derivatives symbolically.
-An explicitly supplied speed must pass the leading commutator check and its
-result applies only to that chosen leader.
+For several fields, use e.g. `JetSpace(("r", "s"))` and give
+`Series.from_expr` a tuple of expressions with the same explicit cutoff.
+Build inputs as SymPy expressions using jets from the factory, not as
+strings. Without an explicit leader the coupled solver uses arbitrary local
+Tsarev speed values and their free pure derivatives. A supplied speed must
+commute with the dispersionless flow, and its result covers only that choice.
 
-Run `python -m unittest discover -v` from the checkout. The test suite
-covers scalar KdV and Burgers, a scalar obstruction with a valid
-transformation, a non-Hopf speed with a logarithmic transformation,
-and a genuinely coupled two-component example through `O(ε³)`.
+Run `python -m unittest discover -v` from the checkout. The example runners
+and coefficient archives are repository material, not importable modules
+installed by the wheel. The longest benchmark runs are separate from the
+default regression suite; follow the example instructions below to reproduce them.
 
-## Supported scope and limits
+## What the results mean
 
-- Scalar solving uses exact Laurent–log quadrature for the nondegenerate
-  leading speed `f(u)u_x`; coefficients depend on state and parameters.
-- The coupled path takes diagonal semi-Hamiltonian systems in Riemann
-  coordinates. The generalized hodograph action determines each unknown
-  top transverse derivative and top own-jet coefficient. Integrate these
-  exactly, descending jet orders, with no candidate generator basis or
-  guessed exponents. The input is the equation, not an already known
-  symmetry lift.
-- A weight-one generator can need a state-dependent correction. The
-  program checks the residual shape and affine Darboux compatibility.
-  It uses exact quadrature in decoupled cases, and otherwise defines the
-  correction by the exact local radial Volterra integral equation with
-  zero axis data. For the two-component inverse-difference case,
-  `DarbouxProblem.difference_solution()` also gives a finite quadrature.
-  For the latter no finite approximation is substituted for the solution.
-  Supply a regular coordinate basepoint with
-  `quasitrivialize(jets, equation, solver=CoupledSolver(basepoint=(...)))`;
-  by default the basepoint is symbolic. Choose a sufficiently small
-  nonsingular cube centered there. `volterra_definitions(*coefficients)`
-  retrieves the defining problems from returned SymPy expressions.
-- Every answer is checked in physical jets. `UnresolvedTransformation`
-  reports a failed step and its order and residual, not a conclusion
-  of nonintegrability. Finite Laurent–log jet support is required;
-  no global solution or elementary closed form for arbitrary
-  smooth state functions is promised.
-- Pick a local domain where speed differences, self-derivatives and any
-  denominators in the answer are nonzero. Logs are formal first-jet
-  logarithms, represented by `jets.log(i)`. The package does not select
-  analytic branches or infer global domain assumptions.
-- Polynomiality is assessed only through the cutoff. Conditional identities
-  and undetermined expressions are kept distinct from certified obstructions.
-  A result through finite order asserts neither all-order integrability nor
-  convergence.
+- Scalar input has leading term $f(u)u_x$, with nonzero $f'(u)$ on the
+  chosen domain. The multicomponent path starts with a diagonal
+  semi-Hamiltonian system in Riemann coordinates, with distinct speeds
+  and nonzero self-derivatives. It does not find those coordinates for you.
+- The scalar and coupled solvers use exact local quadratures in a finite
+  Laurent–log jet class; negative first-jet powers and formal first-jet logs
+  are allowed in the transformation. Choose a regular local domain where
+  the required denominators and first jets do not vanish.
+- A coupled first-order correction may involve a state-dependent affine
+  Darboux equation. The default solver can return an exact local integral
+  representation, not a numerical approximation or an elementary formula.
+  See [Architecture](ARCHITECTURE.md#3-transformation-first) for the
+  choice of basepoint and access to its defining equations.
+- `UnresolvedTransformation` means construction or verification did not
+  complete within the supported class. It is not, by itself, a proof of
+  nonexistence. A verified transformation is still a valid result when a
+  transported symmetry is certified nonpolynomial. The other polynomiality
+  statuses are `polynomial`, `conditional`, and `undetermined`;
+  `obstructed` denotes a certified nonzero condition.
+- These are local formal calculations. Finite-order agreement does not
+  establish all-order integrability, convergence, or global existence.
 
-## Toda / Dubrovin–Zhang benchmark
+## Reproducible examples
 
-The [Toda example](examples/toda/README.md) solves the coupled homological
-equations from the original lattice flow through `O(ε⁷)`, then matches both
-components of the published `F₁` and `F₂` in the tau gauge. The reproducible
-runner, full exact coefficient data, and a reconstructed genus-three density
-are in `examples/toda/`.
+| Example | Verified result |
+| --- | --- |
+| [Toda / CP¹](examples/toda/README.md) | Original and centered lattice maps through $O(\epsilon^7)$, including comparison with published genus-one and genus-two formulas. |
+| [Toda symmetry transport](examples/toda/SYMMETRIES.md) | Three additional Toda flows through $O(\epsilon^7)$, checked against their difference equations. |
+| [High-order Toda](examples/toda/HIGH_ORDER.md) | Centered maps through $O(\epsilon^{11})$, with timings and peak memory. This uses a benchmark-specific sparse implementation, not the generic solver. |
+| [Corrected CP¹ loop equation](examples/toda/LOOP_EQUATION.md#from-the-ten-order-quasi-miura-map-through-genus-five) | Computed densities $F_1,\ldots,F_5$ satisfy the corrected equation through genus five. |
+| [A₂ Boussinesq](examples/a2/README.md) and [parameter screen](examples/a2/SCREEN.md) | Maps and loop check through genus three; within the specified exact truncated family the screen leaves constant dispersion. |
 
-## Development documents
+## Documentation and references
 
-- [AGENTS.md](AGENTS.md): mathematical and engineering rules.
-- [ARCHITECTURE.md](ARCHITECTURE.md): conventions, operations and result contract.
-- [DEVELOPMENT.md](DEVELOPMENT.md): implementation and verification protocol.
-- [PLAN.md](PLAN.md): milestone sequence and acceptance tests.
-- [CONSTRUCTIVE_PLAN.md](CONSTRUCTIVE_PLAN.md): the revised coupled algorithm.
-- [TODO.md](TODO.md): actionable backlog.
-- [PROGRESS.md](PROGRESS.md): current status and verification history.
+- [Architecture](ARCHITECTURE.md) for conventions, mathematical assumptions,
+  and verification.
+- [Development notes](DEVELOPMENT.md), [original plan](PLAN.md),
+  [constructive coupled design](CONSTRUCTIVE_PLAN.md), and
+  [verification history](PROGRESS.md).
+- [Known limitations](TODO.md), [release checklist](RELEASING.md), and
+  [security policy](SECURITY.md).
 
-## References
+The scalar method follows Liu–Zhang,
+[On Quasitriviality and Integrability of a Class of Scalar Evolutionary PDEs](https://arxiv.org/abs/nlin/0510019),
+§§4–5, with Joel Ekstrand's Mathematica implementation as an algorithmic
+reference. The coupled method uses the generalized hodograph and exactness
+results in [SemiHamiltonian in Lean](https://github.com/siqiliu-tsinghua/semi-hamiltonian/tree/6b53168).
+Reference source files and papers are not bundled or needed at runtime.
+The benchmark pages cite their mathematical formulas separately.
 
-1. [SemiHamiltonian in Lean](https://github.com/siqiliu-tsinghua/semi-hamiltonian/tree/6b53168):
-   local copy at `../reference/semi-hamiltonian`, pinned for development at
-   `6b53168`. The files on hodograph jets, normalized brackets and homological
-   exactness specify the multicomponent operations and their hypotheses.
-2. Liu–Zhang, [On Quasitriviality and Integrability of a Class of Scalar
-   Evolutionary PDEs](https://arxiv.org/abs/nlin/0510019), §4–5:
-   scalar construction, arbitrary leading symmetries, polynomiality criterion
-   and examples for validation.
-3. Joel Ekstrand’s Mathematica package, local reference
-   `../reference/quasitriviality-joel/quasitriviality.m`.
-   Use `reducingVector`, `reducingTransformation`, `transformVector` and
-   `extractEquationsFromExpression` to compare algorithmic steps. The notebook
-   contains examples and is not required or present.
+## License
+
+[MIT](LICENSE).

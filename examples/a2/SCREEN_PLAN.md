@@ -1,9 +1,12 @@
 # A₂ perturbation screen
 
+This document records the completed benchmark plan. The example pages
+contain the implementation results and reproduction commands.
+
 Consider the exact truncated family (no unspecified higher input):
 `U_t=V_x`,
 `V_t=3UU_x+ε²[A(U)U_xxx+B(U)U_xx U_x+C(U)U_x³]`,
-on a connected real interval with `U>0). Use the canonical coordinate
+on a connected real interval with `U>0`. Use the canonical coordinate
 and quasi-Miura conventions of the A₂ example.
 
 1. Construct the equation-only `G₂` with the coupled hodograph

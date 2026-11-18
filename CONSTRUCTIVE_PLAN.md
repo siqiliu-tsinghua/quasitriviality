@@ -1,4 +1,7 @@
-# Replace the coupled search with a constructive homological inverse
+# Constructive coupled homological inverse
+
+This design was implemented in the coupled solver. The sequence below
+records the original integration plan, not an outstanding roadmap.
 
 The previous finite-span solver is not the multicomponent algorithm. Remove
 its candidate, state-basis and degree knobs. Preserve the public transform-first,

@@ -1,6 +1,6 @@
 # Toda and the Dubrovin–Zhang CP¹ map
 
-This is an exact local differential-jet benchmark, modulo
+This page describes the exact local differential-jet benchmark modulo
 `O(epsilon**7)`. We work where `d=r−s=4 exp(U₀/2)>0` and both first
 jets are nonzero. It makes no convergence assertion.
 
@@ -80,7 +80,7 @@ t² = u + z u/2 + z² u/24 − z³ u/48 + O(ε⁴)
 
 Let `E₀` be the dispersionless time derivative. At order `ε^(2g)`
 the predicted tau-coordinate dressing correction is
-`(D E₀ F_g, D² F_g)` in `(t¹,t²)) order. From the genus-one
+`(D E₀ F_g, D² F_g)` in `(t¹,t²)` order. From the genus-one
 determinant formula and the CP¹ `G=−U₀/24` of Example 4,
 `F₁=(log|r_x s_x|−U₀)/24` up to a constant. For `F₂` use the
 independent transcription of [DZ (3.10.116), PDF p. 161](https://arxiv.org/pdf/math/0108160#page=161).
@@ -120,6 +120,8 @@ flow. The complete coefficients are in
 
 ## DZ loop-equation check
 
-The prior free energies also satisfy the independently specialized DZ
-loop equation through genus three. See [the corrections to (3.10.102),
-exact residuals, and reproduction command](LOOP_EQUATION.md).
+The original densities satisfy the independently specialized DZ loop
+equation through genus three. A separate [high-order run](HIGH_ORDER.md)
+constructs the centered maps through `O(ε¹¹)`. The resulting densities
+were checked through genus five. See [the corrections to (3.10.102),
+exact residuals, and reproduction commands](LOOP_EQUATION.md).

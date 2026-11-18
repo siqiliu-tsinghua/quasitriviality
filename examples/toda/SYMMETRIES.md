@@ -4,7 +4,7 @@
 
 The runner reads `G₂,G₄,G₆` from [toda-epsilon6.json](toda-epsilon6.json).
 It never solves a new homological equation. Set `h=(r−s)/4=e^(U/2)`,
-`W=h²`, `V=(r+s)/2`, and `c=V²/2+W). Use the following *leading
+`W=h²`, `V=(r+s)/2`, and `c=V²/2+W`. Use the following *leading
 speeds* in canonical coordinates, in the time normalization of CDZ:
 
 | Flow | Speed in r | Speed in s |
@@ -13,7 +13,7 @@ speeds* in canonical coordinates, in the time normalization of CDZ:
 | Ordinary `t^(2,2)` | `VW+hc` | `VW−hc` |
 | Logarithmic `t^(1,1)` | `V+hU` | `V−hU` |
 
-The leading characteristic uses these speeds times `r_x,s_x).
+The leading characteristic uses these speeds times `r_x,s_x`.
 The first two pairs are the dispersionless limits of the ordinary
 Lax flows with powers 2 and 3; the third is the dispersionless limit
 of the explicit nontranslation extended flow.

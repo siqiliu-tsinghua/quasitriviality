@@ -1,4 +1,7 @@
-# Development plan
+# Original development plan
+
+This is the historical implementation plan. The planned pipeline is complete;
+see [PROGRESS.md](PROGRESS.md) for results and [TODO.md](TODO.md) for limits.
 
 ## Phase 1: a working transform-first pipeline
 
@@ -71,11 +74,8 @@ symmetry without recomputing it.
 - Document the input domain, supported cases, exact verification and any
   unresolved calculation. A finite test is not a proof at every order.
 
-## Later: Dubrovin–Zhang cross-validation
+## Dubrovin–Zhang cross-validation
 
-Add explicit DZ examples and compare the computed transformation with
-known free-energy-derived formulas at matched orders. Record conventions
-and normalization on both sides and account for gauge before comparing.
-This is cross-validation, not an assumption or first-stage dependency.
-Coverage of coefficient domains and general nondiagonal input can be
-planned after the diagonal pipeline is stable.
+Completed with the [Toda / CP¹](examples/toda/README.md) and
+[A₂ Boussinesq](examples/a2/README.md) benchmarks. These comparisons
+validate matched orders and gauges; DZ structure is not a solver dependency.

@@ -1,33 +1,20 @@
-# TODO
+# Known limitations
 
-## Phase 1: implemented and tested
+The planned finite-order implementation and benchmark validation are
+complete. This file records scope limits, not commitments to further
+development.
 
-- [x] Document the scope, formal cutoff, and direction of the transform.
-- [x] Implement exact physical and hodograph jet algebra, formal logs,
-  total/evolutionary derivations, brackets, and truncated Lie actions.
-- [x] Compute the scalar transformation directly in the original state,
-  without Hopf point normalization; return and verify both directions.
-- [x] Reuse the transform for arbitrary leading symmetries and report
-  jet-polynomiality conditions in physical jets.
-- [x] Build the coupled Tsarev family reduction and deterministic
-  homological quadratures, including the affine Darboux residual.
-- [x] Cross-check the equation-only inverse against the Lean-style
-  positive free-jet cocycle construction for a known generic lift.
-- [x] Test independent scalar benchmarks, a negative polynomiality case,
-  and a genuinely coupled manufactured example through `O(ε³)`.
+- The generic solver requires diagonal semi-Hamiltonian leading systems in
+  Riemann coordinates. It does not compute those coordinates automatically.
+- Solving locally with distinct speeds, nonzero self-derivatives and
+  nonvanishing first jets does not give a global existence or convergence
+  result. A failed symbolic construction is not a nonexistence theorem.
+- General affine Darboux corrections may be returned as exact local
+  Volterra definitions, without an elementary closed form.
+- The high-order Toda and A₂ benchmarks use specialized sparse charts.
+  Their achieved orders and timing do not predict general solver performance.
+- The A₂ screen classifies the stated exact truncated perturbation; it does
+  not classify families with independently adjustable higher coefficients.
 
-## Next extensions
-
-- [ ] Add more explicit state-space quadrature reductions and support
-  for inspecting or evaluating the exact local Volterra representation.
-- [ ] Increase supported domains and implement better accounting of
-  coefficient singularities and parameter specializations.
-- [x] Cross-check the CP¹ Toda quasi-Miura map through genus two against
-  Dubrovin–Zhang, and compute and verify its genus-three extension.
-- [x] Verify the same three densities in the corrected Toda DZ loop equation.
-- [x] Add the A₂ Boussinesq benchmark through genus three and verify it
-  independently against the DZ loop equation.
-- [ ] Generalize the specialized fast Laurent arithmetic to arbitrary
-  algebraic state coefficients in the core coupled solver.
-- [ ] Consider nondiagonal input and automatic Riemann coordinates only after
-  the diagonal pipeline is stable.
+For what was implemented and verified, see the [README](README.md) and
+[verification history](PROGRESS.md).

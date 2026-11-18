@@ -1,5 +1,8 @@
 # A₂ / Boussinesq through sixth order
 
+This document records the completed benchmark plan. The example pages
+contain the implementation results and reproduction commands.
+
 1. Fix the `κ=3` convention in [DZ (3.6.55)](https://arxiv.org/pdf/math/0108160#page=94)
    and the Boussinesq identification on [PDF p. 168](https://arxiv.org/pdf/math/0108160#page=168).
    Check the dispersive coefficient independently, either by the

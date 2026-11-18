@@ -1,4 +1,8 @@
-# Progress
+# Implementation and verification history
+
+The supported finite-order pipeline is complete. Entries below record
+results at successive milestones; older test counts and approaches are
+historical, not descriptions of the current release.
 
 ## 2026-11-17: Phase 1
 
@@ -17,9 +21,8 @@
   cover the inverse jet chart, normalized brackets, symbolic arbitrary
   Tsarev speeds, and a manufactured genuinely coupled deformation with
   two nontrivial generator orders.
-- Multicomponent homological solvability is implemented in a configurable
-  finite span. Unsupported inputs are reported as unresolved. The full
-  smooth Darboux construction and DZ cross-validation remain follow-up work.
+- Early version only: the coupled inverse used a configurable finite span.
+  It was replaced by the constructive solver in the next milestone.
 
 Run `python -m unittest discover -v` from the repository root to reproduce
 verification. Changes are committed locally in documented stages.
@@ -57,9 +60,9 @@ and returned the documented cutoff and polynomiality result.
 
 ## 2026-11-17: Toda / Dubrovin–Zhang benchmark
 
-- Deposited all three requested PDFs in `/workspace/reference/toda-dubrovin-zhang`.
-  Read the Toda difference and tau maps, Example 4, and the CP¹ genus-two
-  formula. The PDFs are reference data, not vendored in the repository.
+- Consulted the Toda difference and tau maps, Example 4, and the CP¹
+  genus-two formula. The papers are cited in the example; external source
+  files are not bundled.
 - Computed the complete homogeneous reducing and dressing maps from the
   equation through `O(ε⁷)`. The exact specialized Laurent backend uses the
   same hodograph quadratures as the coupled solver and no free-energy input.
@@ -146,7 +149,7 @@ of 247.75 MiB. The direct physical reducing identity vanishes through
 epsilon^10, and all coefficients through epsilon^8 reproduced with the
 repository runner. See [per-order timings and reproduction instructions](examples/toda/HIGH_ORDER.md).
 
-The same ten-order dressing map now also passes the corrected CP¹ DZ loop
+The same tenth-order dressing map also passes the corrected CP¹ DZ loop
 equation through genus five (ε⁸ in the loop equation). F₄ and F₅ have 1,824
 and 9,199 terms. All three tau identities and two independent exact loop
 residual computations passed; each misprint and a genus-five mutation

@@ -1,10 +1,11 @@
-# Phase 1 implementation protocol
+# Development and verification notes
 
-The transform-first, same-cutoff contract in ARCHITECTURE.md is authoritative.
-Use Python 3.10+, SymPy and the standard-library unittest runner. Keep the
-source usable from a checkout and package it with pyproject.toml.
+The transform-first, same-cutoff contract in [ARCHITECTURE.md](ARCHITECTURE.md)
+is authoritative. Use supported Python 3.11+, SymPy and the standard-library
+unittest runner. Run `python -m unittest discover -v` from the checkout.
+See [RELEASING.md](RELEASING.md) for packaging and release checks.
 
-## Integration and commit sequence
+## Completed integration sequence
 
 1. Jet algebra: normalized exact expressions, separate state and jet symbols,
    formal logarithms, grading, total/evolutionary derivatives and brackets.
@@ -24,8 +25,8 @@ source usable from a checkout and package it with pyproject.toml.
 5. Run the complete suite, check reproducible usage examples, record
    implemented support and limitations, and commit final documentation.
 
-Each complete step gets a local Git commit, without pushing. Code is done
-only when verification is reproducible and limitations are visible.
+The implementation was committed locally in stages. The longer benchmark
+checks have separate reproduction commands linked from [README.md](README.md).
 
 ## Internal interfaces
 
@@ -51,5 +52,5 @@ only when verification is reproducible and limitations are visible.
   conditional and undetermined results. Verify each solver witness before
   using it. Exact cancellation precedes analysis of jet dependence.
 
-Use the example fixtures in PLAN.md. Prefer small exact tests that pinpoint a
+The original acceptance fixtures are in [PLAN.md](PLAN.md). Prefer small exact tests that pinpoint a
 sign, chain-rule, degree or cutoff error. Save no external copies or API calls.
