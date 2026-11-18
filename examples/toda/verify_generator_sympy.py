@@ -7,6 +7,7 @@ from time import monotonic
 
 import sympy as sp
 from quasitriviality import JetSpace
+from quasitriviality.jets import _expr
 
 
 class GapJetSpace(JetSpace):
@@ -28,16 +29,17 @@ class GapJetSpace(JetSpace):
 
     def exact(self, expr):
         r, s = self.states
-        return self.shifted(sp.sympify(expr)).xreplace({self.delta: r-s})
+        return self.shifted(_expr(expr)).xreplace({self.delta: r-s})
 
     def dx(self, expr, times=1):
-        out = sp.sympify(expr)
+        out = _expr(expr)
         for _ in range(times):
             out = self.exact(sum(self.jet(i, s+1)*self.partial(out,i,s)
                                  for i,s in self.active_jets(out)))
         return out
 
     def bracket(self, left, right):
+        left, right = self._characteristic(left), self._characteristic(right)
         q_cache = {(i, 0): q for i, q in enumerate(left)}
         p_cache = {(i, 0): p for i, p in enumerate(right)}
         return tuple(self.exact(self._evolve(left, p, q_cache)-self._evolve(right, q, p_cache))

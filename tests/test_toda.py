@@ -47,5 +47,20 @@ class TodaBenchmarkTests(unittest.TestCase):
         )))
 
 
+class GapJetSpaceInputTests(unittest.TestCase):
+    def test_verifier_jet_space_rejects_expression_text(self):
+        from examples.toda.verify_generator_sympy import GapJetSpace
+
+        jet_space = GapJetSpace()
+        r, s = jet_space.states
+        for text in ("r + s", b"r + s"):
+            with self.subTest(text=text):
+                with self.assertRaisesRegex(TypeError, "not expression text"):
+                    jet_space.exact(text)
+                with self.assertRaisesRegex(TypeError, "not expression text"):
+                    jet_space.dx(text)
+        self.assertEqual(jet_space.exact(r + s), r + s)
+
+
 if __name__ == "__main__":
     unittest.main()

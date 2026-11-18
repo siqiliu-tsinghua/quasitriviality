@@ -12,6 +12,20 @@ class DarbouxTests(unittest.TestCase):
         self.space = JetSpace(("r", "s"))
         self.r, self.s = self.space.states
 
+    def test_public_expression_helpers_reject_expression_text(self):
+        chart = HodographChart(self.space, self.space.states)
+        problem = DarbouxProblem(chart, {}, basepoint=(1, 0))
+        for text in ("r + s", b"r + s"):
+            with self.subTest(text=text):
+                with self.assertRaisesRegex(TypeError, "not expression text"):
+                    volterra_definitions(text)
+                with self.assertRaisesRegex(TypeError, "not expression text"):
+                    problem.contraction_condition(text, 2)
+                with self.assertRaisesRegex(TypeError, "not expression text"):
+                    problem.contraction_condition(sp.Rational(1, 64), text)
+        self.assertEqual(volterra_definitions(self.r + self.s, 2), ())
+        self.assertTrue(problem.contraction_condition(sp.Rational(1, 64), 2))
+
     def test_explicit_two_component_quadrature(self):
         r, s = self.space.states
         chart = HodographChart(self.space, (2*r+s, r+2*s))

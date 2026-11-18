@@ -9,7 +9,7 @@ from types import MappingProxyType
 import sympy as sp
 from sympy.core.function import ArgumentIndexError
 
-from .jets import canonical, is_zero
+from .jets import _expr, canonical, is_zero
 
 
 class DarbouxUnresolved(ValueError):
@@ -178,7 +178,7 @@ class DarbouxProblem:
         Supply a radius and a joint sup bound for Gamma and its first
         state derivative on the cube (which must lie in the smooth domain).
         """
-        radius, sup_bound = map(sp.sympify, (radius, sup_bound))
+        radius, sup_bound = map(_expr, (radius, sup_bound))
         return sp.And(radius > 0, radius <= 1, sup_bound >= 0,
                       8 * self.dimension * radius * sup_bound < 1)
 
@@ -280,7 +280,7 @@ def volterra_definitions(*expressions):
     """Find exact defining Darboux problems referenced in SymPy expressions."""
     found = {}
     for value in expressions:
-        value = sp.sympify(value)
+        value = _expr(value)
         for function in sorted(value.atoms(sp.Function), key=sp.default_sort_key):
             problem = getattr(function.func, "darboux_problem", None)
             if isinstance(problem, DarbouxProblem):

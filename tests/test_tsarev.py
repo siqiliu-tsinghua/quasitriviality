@@ -26,6 +26,13 @@ class TsarevFamilyTests(unittest.TestCase):
         self.assertTrue(is_zero((actual - expr).xreplace(concrete).doit()))
         self.assertLessEqual(actual.atoms(sp.Derivative), set(self.family.free_jets(3)))
 
+    def test_reduce_rejects_expression_text(self):
+        for text in ("r + s", b"r + s"):
+            with self.subTest(text=text):
+                with self.assertRaisesRegex(TypeError, "not expression text"):
+                    self.family.reduce(text)
+        self.assertEqual(self.family.reduce(self.r + self.s), self.r + self.s)
+
     def test_arbitrary_leading_characteristic_commutes(self):
         p, q = (self.space.jet(i, 1) for i in range(2))
         first, second = self.family.values

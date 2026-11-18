@@ -8,7 +8,7 @@ from typing import Iterable
 import sympy as sp
 from sympy.core.function import AppliedUndef
 
-from .jets import JetSpace, canonical, is_zero
+from .jets import JetSpace, _expr, canonical, is_zero
 
 
 class TsarevFamily:
@@ -129,4 +129,4 @@ class TsarevFamily:
         For a formally differentiated Tsarev expression, evaluate the state
         differentiations normally (e.g. with SymPy diff) before reducing.
         """
-        return canonical(self._rewrite(sp.sympify(expr)))
+        return canonical(self._rewrite(_expr(expr)))
